@@ -1,0 +1,29 @@
+# Сборка
+Debug/
+Release/
+x64/
+x86/
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.lib
+*.exp
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.sln.docstates
+ipch/
+*.aps
+*.ncb
+*.opendb
+*.sdf
+*.cachefile
+
+# CLion / CMake
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+*.cmake
