@@ -1,0 +1,136 @@
+subject_domain_of_industrial_enterprise
+=> nrel_main_idtf:
+	[Предметная область промышленного предприятия]
+	(* <- lang_ru;; *);
+<- concept_subject_domain;
+=> nrel_ontology:
+	structural_specification_of_subject_domain_of_industrial_enterprise;
+	set_theoretic_ontology_of_subject_domain_of_industrial_enterprise;;
+
+
+structural_specification_of_subject_domain_of_industrial_enterprise = [*
+<- concept_structural_specification_of_subject_domain;;
+
+subject_domain_of_industrial_enterprise = [*
+-> rrel_maximum_studied_object_class:
+	concept_production_object;
+-> rrel_not_maximum_studied_object_class:
+	concept_production_unit;
+	concept_production_object_type;
+	concept_service_type;
+	concept_generalized_equipment_type;
+	concept_specific_equipment_type;
+	concept_stationary_equipment;
+	concept_production_process;
+	concept_quality_control_process;
+	concept_maintenance_process;
+	concept_planning_process;
+-> rrel_explored_relation:
+	rrel_object_characteristic;
+	rrel_object_parameter;
+	rrel_object_operation;
+	rrel_internal_parameter;
+	rrel_subdivision_level_parameter;
+	rrel_public_parameter;
+	rrel_regulated_operation;
+	nrel_adjacent_subdivision;
+	nrel_superior_subdivision;
+	nrel_subordinate_subdivision;
+	nrel_technological_dependence;
+	nrel_interaction;
+	nrel_connection;
+	nrel_part_independent;
+	nrel_part_inseparable;
+	nrel_execution;;
+*];
+<= nrel_child_subject_domain:
+	subject_domain_of_enterprise_management;
+=> nrel_child_subject_domain:
+	subject_domain_of_main_production;
+	subject_domain_of_auxiliary_production;;
+*];;
+
+
+subject_domain_of_industrial_enterprise = [*
+
+regulation_R
+<- concept_service_type;
+=> nrel_execution:
+	workshop_1;;
+
+workshop_1
+<- concept_specific_equipment_type;
+=> nrel_part_inseparable:
+	cnc_machine_01;
+-> rrel_object_parameter: rrel_internal_parameter:
+	rated_power_cnc_machine_01;
+-> rrel_object_operation: rrel_public_parameter:
+	size_control_operation;;
+
+cnc_machine_01
+<- concept_specific_equipment_type;
+=> nrel_interaction:
+	section_2;;
+
+section_2
+<- concept_specific_equipment_type;
+<= nrel_subordinate_subdivision:
+	workshop_3;;
+
+workshop_3
+<- concept_specific_equipment_type;
+<= nrel_subordinate_subdivision:
+	enterprise_E;;
+*];;
+
+
+set_theoretic_ontology_of_subject_domain_of_industrial_enterprise = [*
+<- concept_set_theoretic_ontology_of_subject_domain;;
+
+concept_production_object
+=> nrel_subdividing: {
+	concept_production_unit;
+	concept_production_object_type
+};;
+
+concept_production_object_type
+=> nrel_subdividing: {
+	concept_service_type;
+	concept_generalized_equipment_type;
+	concept_specific_equipment_type
+};;
+
+concept_specific_equipment_type
+=> nrel_inclusion:
+	concept_stationary_equipment;;
+
+rrel_object_characteristic
+=> nrel_subdividing: {
+	rrel_object_parameter;
+	rrel_object_operation
+};
+=> nrel_subdividing: {
+	rrel_internal_parameter;
+	rrel_subdivision_level_parameter;
+	rrel_public_parameter
+};;
+
+rrel_object_operation
+=> nrel_inclusion:
+	rrel_regulated_operation;;
+
+nrel_adjacent_subdivision
+=> nrel_subdividing: {
+	nrel_superior_subdivision;
+	nrel_subordinate_subdivision
+};;
+
+nrel_technological_dependence
+=> nrel_inclusion:
+	nrel_interaction;;
+
+nrel_connection
+=> nrel_inclusion:
+	nrel_part_independent;
+	nrel_part_inseparable;;
+*];;
