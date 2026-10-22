@@ -1,16 +1,19 @@
 #include "mmemory.h"
 #include <time.h>
 
+// Генерим случ число для фрагментушки
 int generate_random(int max)
 {
     return rand() % max + 1;
 }
 
+// выделение виртуальной памяти через mmap и настройка первого блока
 void init_memory_manager(MemoryManager *manager, size_t total_size)
 {
+    // Запрос виртуальной памяти у оски
     manager->start_addr = mmap(NULL, total_size, PROT_READ | PROT_WRITE,
-                               MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    if (manager->start_addr == MAP_FAILED)
+                               MAP_PRIVATE | MAP_ANONYMOUS, -1, 0); 
+    if (manager->start_addr == MAP_FAILED) 
     {
         perror("mmap");
         exit(EXIT_FAILURE);
@@ -18,18 +21,20 @@ void init_memory_manager(MemoryManager *manager, size_t total_size)
 
     manager->total_size = total_size;
     manager->head = (MemoryBlock *)manager->start_addr;
-    manager->head->size = total_size - sizeof(MemoryBlock);
+    manager->head->size = total_size - sizeof(MemoryBlock); // Размер за вычетом служебного заголовка
     manager->head->next = NULL;
     manager->head->isFree = true;
     srand(time(NULL));
 }
 
+// Искусственное дробление памяти для имитации внешней фрагментации
 void run_fragmentation(MemoryManager *manager)
 {
     MemoryBlock *current = manager->head;
     while (current->size >= manager->total_size / 10 + sizeof(MemoryBlock))
     {
         int fragmentation_size = generate_random(manager->total_size / 10);
+        // Создание нового блока памяти сразу за текущим фрагментом
         MemoryBlock *new_block = (MemoryBlock *)((char *)current + fragmentation_size + sizeof(MemoryBlock));
         new_block->size = current->size - fragmentation_size - sizeof(MemoryBlock);
         current->next = new_block;
@@ -39,6 +44,8 @@ void run_fragmentation(MemoryManager *manager)
     }
     current->next = NULL;
 }
+
+// first Fit dlya выделения памяти
 void *allocate_memory(MemoryManager *manager, size_t size)
 {
     MemoryBlock *current = manager->head;
@@ -46,24 +53,29 @@ void *allocate_memory(MemoryManager *manager, size_t size)
     {
         if (current->isFree && current->size >= size)
         {
-            current->isFree = false;
-            return (char *)current + sizeof(MemoryBlock);
+            current->isFree = false; // помечаем что занято
+            return (char *)current + sizeof(MemoryBlock); // Возвращаем указатель на данные
         }
         current = current->next;
     }
-    return NULL;
+    return NULL; // все занято 
 }
+
+//освобождение памяти по пользовательскому указателю (сдвиг назад для нахождения заголовка)
 void free_memory(void *ptr)
 {
     MemoryBlock *block = (MemoryBlock *)((char *)ptr - sizeof(MemoryBlock));
     block->isFree = true;
 }
+
+// Полное удаление менеджера и возврат памяти операционной системе через munmap
 void clear(MemoryManager *manager)
 {
     munmap(manager->start_addr, manager->total_size);
     manager->head = NULL;
 }
 
+// безопасное чтение с проверкой, не свободен ли блок и не выходит ли размер за границы
 char *safe_read(void *dest, size_t size)
 {
     MemoryBlock *block = (MemoryBlock *)((char *)dest - sizeof(MemoryBlock));
@@ -79,6 +91,8 @@ char *safe_read(void *dest, size_t size)
     }
     return (char *)block + sizeof(MemoryBlock);
 }
+
+// безопасная запись с проверкой статуса блока и предотвращением выхода за границы
 void safe_write(void *dest, size_t size, char *info)
 {
     MemoryBlock *block = (MemoryBlock *)((char *)dest - sizeof(MemoryBlock));
