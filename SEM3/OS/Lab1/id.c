@@ -3,19 +3,19 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-void report(int num)
+void start(int num)
 {
     printf("Процесс №%d: PID = %d, PPID = %d\n", num, getpid(), getppid());
     fflush(stdout);
 }
 
-void spawn(int parent_pid, int child_pid)
+void birth(int parent_pid, int child_pid)
 {
     printf("Процесс с ID %d породил процесс с ID %d\n", parent_pid, child_pid);
     fflush(stdout);
 }
 
-void finish(int num)
+void end(int num)
 {
     printf("Процесс №%d: PID = %d, PPID = %d завершает работу\n", num, getpid(), getppid());
     fflush(stdout);
@@ -24,7 +24,7 @@ void finish(int num)
 
 int main(void)
 {
-    report(1);
+    start(1);
 
     pid_t pid2 = fork();
     if (pid2 < 0)
@@ -34,10 +34,10 @@ int main(void)
     }
     if (pid2 == 0)
     {
-        report(2);
-        finish(2);
+        start(2);
+        end(2);
     }
-    spawn(getpid(), pid2);
+    birth(getpid(), pid2);
 
     pid_t pid3 = fork();
     if (pid3 < 0)
@@ -47,7 +47,7 @@ int main(void)
     }
     if (pid3 == 0)
     {
-        report(3);
+        start(3);
 
         pid_t pid5 = fork();
         if (pid5 < 0)
@@ -57,7 +57,7 @@ int main(void)
         }
         if (pid5 == 0)
         {
-            report(5);
+            start(5);
 
             pid_t pid7 = fork();
             if (pid7 < 0)
@@ -67,14 +67,14 @@ int main(void)
             }
             if (pid7 == 0)
             {
-                report(7);
-                finish(7);
+                start(7);
+                end(7);
             }
-            spawn(getpid(), pid7);
+            birth(getpid(), pid7);
             wait(NULL);
-            finish(5);
+            end(5);
         }
-        spawn(getpid(), pid5);
+        birth(getpid(), pid5);
 
         pid_t pid6 = fork();
         if (pid6 < 0)
@@ -84,16 +84,16 @@ int main(void)
         }
         if (pid6 == 0)
         {
-            report(6);
-            finish(6);
+            start(6);
+            end(6);
         }
-        spawn(getpid(), pid6);
+        birth(getpid(), pid6);
 
         wait(NULL);
         wait(NULL);
-        finish(3);
+        end(3);
     }
-    spawn(getpid(), pid3);
+    birth(getpid(), pid3);
 
     pid_t pid4 = fork();
     if (pid4 < 0)
@@ -103,10 +103,10 @@ int main(void)
     }
     if (pid4 == 0)
     {
-        report(4);
-        finish(4);
+        start(4);
+        end(4);
     }
-    spawn(getpid(), pid4);
+    birth(getpid(), pid4);
 
     wait(NULL);
     wait(NULL);
